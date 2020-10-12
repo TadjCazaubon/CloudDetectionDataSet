@@ -1,0 +1,70 @@
+
+Corrupted data in the form ['7'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['23'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['3', '233'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['7', '193'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['149'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['1', '161'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['6'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['6'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['1', '165'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['157'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['80', '180'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['9', '189'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['', '143', '143'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['5'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form [] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['2', '180'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['206', '210'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['26', '120'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['177', '180'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['', '156'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form [] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form [] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['73', '155'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['170', '170'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form [] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['9'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['163'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form [] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form [] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['', '233', '233'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form [] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['', '185', '185'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form [] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form [] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form [] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form [] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['67'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form [] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['97'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['', '241'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['53'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['', '153'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['7'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form [] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['86'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form [] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form [] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form [] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['48'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form [] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['', '253', '253'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['31'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['4'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form [] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form [] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['166'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['188', '175'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form [] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['', '234', '239'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form [] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form [] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['209'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['', '189'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['188'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['183', '175'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['89'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['221'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['217'] in Main\Cloud-CSVS\BGRDistribution.csv
+Corrupted data in the form ['', '209'] in Main\Cloud-CSVS\BGRDistribution.csv
