@@ -1,0 +1,130 @@
+====================================================================================================================
+							NOTES
+====================================================================================================================
+
+> Adapt the Dataframes to work with an SQL database. This is so the software can be properly scaled into a interprise
+  level, server-side application.
+
+	- At the time of writing this [26/10/2020] I do not know how to do this sort of database work. I however,
+	  can learn.
+	
+		-> I'm unsure of how I would read and process the data using an SQL database rather than using dataframes, but 
+		   I feel as if it shouldn't be that different of a process.
+
+		-> It should be possible to do the same matrix operations on an SQL table as a dataframe. It probably just 
+		  requires more research but probably less computational overhead. Not to mention the caching and deugging 
+		  potential of database software.
+	
+
+	- This database should house a number of tables, which include:
+		
+		+====================================================================================================
+							Pixel Values
+		+====================================================================================================
+		-> CloudPixelsBGR: This houses the BGR values of cloud pixels. Columns are pixels with 3 rows which are
+		   the BGR values.
+		
+		-> SkyPixelsBGR: This houses the BGR values of skypixels. Columns are pixels with 3 rows which are
+		   the BGR values.
+
+
+
+		-> CloudPixelsHSV: This houses the HSV values of cloud pixels. Columns are pixels with 3 rows which are
+		   the HSV values. 
+
+		-> SkyPixelsHSV: This houses the HSV values of sky pixels. Columns are pixels with 3 rows which are
+		the HSV values. 
+		
+		+====================================================================================================
+							Principle Component Values
+		+====================================================================================================
+
+		-> CloudPixelsBGR.PCA: This houses the PCA Values of cloud pixels read in the BGR format. Columns are
+		   pixels with 3 rows which are PC1,PC2 and PC3.
+
+		-> SkyPixelsBGR.PCA: This houses the PCA Values of sky pixels read in the BGR format. Columns are
+		   pixels with 3 rows which are PC1,PC2 and PC3.
+
+
+
+		-> CloudPixelsHSV.PCA: This houses the PCA Values of cloud pixels read in the HSV format. Columns are
+		   pixels with 3 rows which are PC1,PC2 and PC3.
+
+		-> SkyPixelsHSV.PCA: This houses the PCA Values of sky pixels read in the HSV format. Columns are
+		   pixels with 3 rows which are PC1,PC2 and PC3.
+
+	- SInce the existing library for calculating PCA in python requires the use of dataframes, I am left with 2
+	  options: 
+		
+		-> The first is to use the databases to store the image data, and import that data as dataframes to
+	  	   be calculated, which would defeat the purpose of not storing them as dataframes in the first place.
+		   This could technically be faster if i use multiprocessing to store the data for clouds and skies 
+		   separately, but that could be done with the program in its current form without the use of a database.
+
+		-> The second option is to either find another lesser-known library, or create a PCA function to manually
+		   calculate my PCA values. I could do this with the help of Murray, but I'm unsure of how complex this 
+		   would be. Any function I create would most likely be inefficient compared to existing libraries and 
+		   introduces computational overhead. Multiprocessing can only save me so much.
+		   
+
+> Replace all relative file paths to work WITHIN Main, instead of having of one level up from Main. Until this is
+  done, the application cannot be made into a standalone executable.
+
+> Keep the errorlogs, but consolidate them into one folder. They should have an approximate timestamp.
+
+
+> Do away with any writing to csv files. All data should be stored within a databse table for each step for better
+  debugging. no intermediate steps of writing to any sort of arrays.
+
+> A good idea might be to create a config file for the most important file paths and values, which can be configured 
+  by the end user.
+
+
+
+> Either use a different graphing framework or create a custom one. Matplotlib's scatterplot function is not 
+  suitable for this large of a dataset. Preferable choose one which allows us to save and view the graphs
+  later. If matplotlib absolutely must be used, focus in on the area of the graph like valerio had said.
+	
+	- It may also be possible to use something like matlab to graph our scatterplot, and even view it against a 3D plot
+	  of both our BGR and HSV values to review. 
+
+
+
+> Save the HSV and BGR distributions seperately, rather than having to manually switch the values to save each.
+
+> Fix the Scree plot calculations.
+
+
+
+> Read the images as they are, rather than resizing as to avoid compression errors in BGR readings.
+
+> Add images which with the sun directly in view.
+
+> Redo the image blocking so that the EXACT red and black values can be noted and 
+  used across all images. As of now, there are slight deviations in the colours, which does not cause alot of 
+  noticable error in results, but this small error can be done away with entirely.
+
+
+
+====================================================================================================================
+
+
+After writing this, I realized that it may actually be within my best interest to completely rewrite this program
+from scratch.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

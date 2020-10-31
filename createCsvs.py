@@ -175,7 +175,7 @@ def create_csv(Blocked,Reference,counter,FuckedImagesCounter):
     #skyImage = cv2.cvtColor(skyImage,cv2.COLOR_HSV2BGR)
 
     for cloudPixel,skyPixel in zip(cloudImage,skyImage):
-        for cloudPixelValue,skyPixelValue in zip(cloudPixel,skyPixel):
+         for cloudPixelValue,skyPixelValue in zip(cloudPixel,skyPixel):
 
             cloudB,cloudG,cloudR = cloudPixelValue
             skyB,skyG,skyR = skyPixelValue
