@@ -43,23 +43,23 @@ def create_csv(Blocked,Reference,counter,FuckedImagesCounter):
     We define our globals we may need for later such as paths
     """
 
+    cloudCSVFolder = r'Main/Cloud-CSVS'
+    cloudBGRCSVName = 'BGRDistribution.csv'
+    cloudHSVCSVName="HSVDistribution.csv"
+    cloudBGRCSVPath = os.path.join(cloudCSVFolder,cloudBGRCSVName)
+    cloudHSVCSVPath = os.path.join(cloudCSVFolder,cloudHSVCSVName)
 
-    i = counter
-
-
-    cloudCsvFolder = r'Main\Cloud-CSVS'
-    cloudCsvName = 'BGRDistribution.csv'
-    cloudCsvPath = os.path.join(cloudCsvFolder,cloudCsvName)
-
-    skyCsvFolder = r'Main\Sky-CSVS'
-    skyCsvName = 'BGRDistribution.csv'
-    skyCsvPath = os.path.join(skyCsvFolder,skyCsvName)
-
-    ImageErrorLogs = r"Main/ErrorLogs/VisualisedImageErrors"
+    skyCSVFolder = r'Main/Sky-CSVS'
+    skyBGRCSVName = 'BGRDistribution.csv'
+    skyHSVCSVName = "HSVDistribution.csv"
+    skyBGRCSVPath = os.path.join(skyCSVFolder,skyBGRCSVName)
+    skyHSVCSVPath = os.path.join(skyCSVFolder,skyHSVCSVName)
 
 
     cloudPixelsBGR = []
     skyPixelsBGR = []
+    cloudPixelsHSV = []
+    skyPixelsHSV = []
 
 
     #----------------------------------------------------------------------------------------------------#
@@ -71,11 +71,11 @@ def create_csv(Blocked,Reference,counter,FuckedImagesCounter):
 
 
     blockedImage = cv2.imread(Blocked)
-    blockedImage = cv2.cvtColor(blockedImage,cv2.COLOR_BGR2HSV)
+    blockedImageHSV = cv2.cvtColor(blockedImage,cv2.COLOR_BGR2HSV)
     #blockedImage = cv2.resize(blockedImage,(400,300))
 
     referenceImage = cv2.imread(Reference)
-    referenceImage = cv2.cvtColor(referenceImage,cv2.COLOR_BGR2HSV)
+    referenceImageHSV = cv2.cvtColor(referenceImage,cv2.COLOR_BGR2HSV)
     #referenceImage = cv2.resize(referenceImage,(400,300))
 
 
@@ -101,6 +101,20 @@ def create_csv(Blocked,Reference,counter,FuckedImagesCounter):
     redMask = cv2.bitwise_or(maskOneRed,maskTwoRed)
 
     """
+    Do the same for the HSV values
+    """
+    u_b_red1HSV = np.array([10, 255, 255])
+    l_b_red1HSV = np.array([0, 30, 30])
+
+    u_b_red2HSV = np.array([180, 255, 255])
+    l_b_red2HSV = np.array([170, 50, 50])
+
+    maskOneRedHSV = cv2.inRange(blockedImageHSV,l_b_red1HSV,u_b_red1HSV)
+    maskTwoRedHSV = cv2.inRange(blockedImageHSV,l_b_red2HSV,u_b_red2HSV)
+
+    redMaskHSV = cv2.bitwise_or(maskOneRedHSV,maskTwoRedHSV)  
+
+    """
     Now we do the same for Black.
     We'll use a range of black to represent The Sky
     """
@@ -111,6 +125,14 @@ def create_csv(Blocked,Reference,counter,FuckedImagesCounter):
 
     blackMask = cv2.inRange(blockedImage,l_b_black,u_b_black)
 
+    """
+    Same for HSV
+    """
+    u_b_blackHSV = np.array([180, 255,30])
+    l_b_blackHSV = np.array([0, 0, 0])
+
+    blackMaskHSV = cv2.inRange(blockedImageHSV,l_b_blackHSV,u_b_blackHSV)
+
 
     #----------------------------------------------------------------------------------------------------#
 
@@ -120,8 +142,11 @@ def create_csv(Blocked,Reference,counter,FuckedImagesCounter):
     """
 
 
-    cloudImage = cv2.bitwise_and(referenceImage,referenceImage,mask = redMask)
-    skyImage = cv2.bitwise_and(referenceImage,referenceImage,mask = blackMask)
+    cloudImageBGR = cv2.bitwise_and(referenceImage,referenceImage,mask = redMask)
+    skyImageBGR = cv2.bitwise_and(referenceImage,referenceImage,mask = blackMask)
+
+    cloudImageHSV = cv2.bitwise_and(referenceImageHSV,referenceImageHSV,mask = redMaskHSV)
+    skyImageHSV = cv2.bitwise_and(referenceImageHSV,referenceImageHSV,mask = blackMaskHSV)
 
 
 
@@ -132,36 +157,6 @@ def create_csv(Blocked,Reference,counter,FuckedImagesCounter):
 
     #cv2.waitKey(0)
 
-    #----------------------------------------------------------------------------------------------------#
-
-    """
-    Saving the Images to see where I fucked up
-    """
-
-
-
-
-
-
-    """blockedImageName = f"Blocked{FuckedImagesCounter}.jpg"
-    blockedImageErrorPath = os.path.join(ImageErrorLogs,blockedImageName)
-    blockedImageError = cv2.cvtColor(blockedImage,cv2.COLOR_HSV2BGR)
-    cv2.imwrite(blockedImageErrorPath,blockedImageError)"""
-
-    """referenceImageName = f"Reference{FuckedImagesCounter}.jpg"
-    referenceImageErrorPath = os.path.join(ImageErrorLogs,referenceImageName)
-    referenceImageError = cv2.cvtColor(referenceImage,cv2.COLOR_HSV2BGR)
-    cv2.imwrite(referenceImageErrorPath,referenceImageError)"""
-
-    cloudImageName = f"Cloud{FuckedImagesCounter}.jpg"
-    cloudeImageErrorPath = os.path.join(ImageErrorLogs,cloudImageName)
-    cloudImageError = cv2.cvtColor(cloudImage,cv2.COLOR_HSV2BGR)
-    cv2.imwrite(cloudeImageErrorPath,cloudImageError)
-
-    skyImageName = f"Sky{FuckedImagesCounter}.jpg"
-    skyImageErrorPath = os.path.join(ImageErrorLogs,skyImageName)
-    skyImageError = cv2.cvtColor(skyImage,cv2.COLOR_HSV2BGR)
-    cv2.imwrite(skyImageErrorPath,skyImageError)
 
     #----------------------------------------------------------------------------------------------------#
 
@@ -174,19 +169,37 @@ def create_csv(Blocked,Reference,counter,FuckedImagesCounter):
     #cloudImage = cv2.cvtColor(cloudImage,cv2.COLOR_HSV2BGR)
     #skyImage = cv2.cvtColor(skyImage,cv2.COLOR_HSV2BGR)
 
-    for cloudPixel,skyPixel in zip(cloudImage,skyImage):
-         for cloudPixelValue,skyPixelValue in zip(cloudPixel,skyPixel):
 
-            cloudB,cloudG,cloudR = cloudPixelValue
-            skyB,skyG,skyR = skyPixelValue
+    for cloudPixelBGR,skyPixelBGR in zip(cloudImageBGR,skyImageBGR):
+         for cloudPixelValueBGR,skyPixelValueBGR in zip(cloudPixelBGR,skyPixelBGR):
+
+            cloudB,cloudG,cloudR = cloudPixelValueBGR
+            skyB,skyG,skyR = skyPixelValueBGR
 
             if cloudB!=0 or cloudG!=0 or cloudR!=0:
-                cloudPixelsBGR.append(list(cloudPixelValue))
-            if skyB!=0 or skyG!=0 or skyR!=0:
-                skyPixelsBGR.append(list(skyPixelValue))
+                    cloudPixelsBGR.append(list(cloudPixelValueBGR))
 
+            if skyB!=0 or skyG!=0 or skyR!=0:
+                    skyPixelsBGR.append(list(skyPixelValueBGR))
             else:
                 continue
+
+
+    for cloudPixel,skyPixel in zip(cloudImageHSV,skyImageHSV):
+        for cloudPixelValue,skyPixelValue in zip(cloudPixel,skyPixel):
+
+            cloudH,cloudS,cloudV = cloudPixelValue
+            skyH,skyS,skyV = skyPixelValue
+
+            if cloudH!=0 or cloudS!=0 or cloudV!=0:
+                    cloudPixelsHSV.append(list(cloudPixelValue))
+
+            if skyH!=0 or skyS!=0 or skyV!=0:
+                    skyPixelsHSV.append(list(skyPixelValue))
+            else:
+                continue
+
+
 
 
     #----------------------------------------------------------------------------------------------------#
@@ -204,7 +217,7 @@ def create_csv(Blocked,Reference,counter,FuckedImagesCounter):
             with open(filePath,'a+',newline = '') as csvFile:
                 writer = csv.writer(csvFile)
                 writer.writerows(pixelBGR)
-                print("Writing to csv")
+                #print("Writing to csv")
             csvFile.close()
 
         except Exception as exception:
@@ -225,28 +238,40 @@ def create_csv(Blocked,Reference,counter,FuckedImagesCounter):
 
 
 
-    skyCsvWriter = threading.Thread(target = writeCsv, args = [skyCsvPath,skyPixelsBGR])
-    cloudCsvWriter = threading.Thread(target = writeCsv, args = [cloudCsvPath,cloudPixelsBGR])
+    skyBGRWriter = threading.Thread(target = writeCsv, args = [skyBGRCSVPath,skyPixelsBGR])
+    cloudBGRWriter = threading.Thread(target = writeCsv, args = [cloudBGRCSVPath,cloudPixelsBGR])
 
-    skyCsvWriter.start()
-    cloudCsvWriter.start()
+    skyHSVWriter = threading.Thread(target = writeCsv, args = [skyHSVCSVPath,skyPixelsHSV])
+    cloudHSVWriter = threading.Thread(target = writeCsv, args = [cloudHSVCSVPath,cloudPixelsHSV])
 
-    skyCsvWriter.join()
-    cloudCsvWriter.join()
+    skyBGRWriter.start()
+    cloudBGRWriter.start()
+    skyHSVWriter.start()
+    cloudHSVWriter.start()
+
+    skyBGRWriter.join()
+    cloudBGRWriter.join()
+    skyHSVWriter.join()
+    cloudHSVWriter.join()
 
 
 #---------------------------------------------------------------------------------------------------------#
 
-def distributionBarGraphGenerator(cloudCsvFolder,skyCsvFolder,graphFolder,distributionCsvName,bins):
+def distributionBarGraphGenerator(cloudCSVFolder,skyCSVFolder,graphFolder,BGRDistributionCSVName,HSVDistributionCSVName,bins):
 
 
     """
     We create our Green, Blue, and Red Distributions here.
     """
 
-    cloudDistributionCsvPath = os.path.join(cloudCsvFolder,distributionCsvName)
-    skyDistributionCsvPath = os.path.join(skyCsvFolder,distributionCsvName)
-    bgrGraphsavePath = os.path.join(graphFolder,'HSVBarGraph.pdf')
+    BGRCloudDistributionCSVPath = os.path.join(cloudCSVFolder,BGRDistributionCSVName)
+    BGRSkyDistributionCSVPath = os.path.join(skyCSVFolder,BGRDistributionCSVName)
+
+    HSVCloudDistributionCSVPath = os.path.join(cloudCSVFolder,HSVDistributionCSVName)
+    HSVSkyDistributionCSVPath = os.path.join(skyCSVFolder,HSVDistributionCSVName)
+
+    bgrGraphsavePath = os.path.join(graphFolder,'BGRBarGraph.pdf')
+    hsvGraphsavePath = os.path.join(graphFolder,'HSVBarGraph.pdf')
 
 
     def readDistributionData(distributionCsv):
@@ -255,6 +280,8 @@ def distributionBarGraphGenerator(cloudCsvFolder,skyCsvFolder,graphFolder,distri
         reds = []
 
         with open(distributionCsv,'r') as file:
+
+            print("FETCHING DATAPOINTS.")
 
             DataValueErrorLogName = (datetime.now().strftime("%Y_%b_%d_%H-%M-%S")+".txt")
             DataValueErrorLogNamePath = r"Main/ErrorLogs/ReadLogs/"+ DataValueErrorLogName
@@ -267,7 +294,9 @@ def distributionBarGraphGenerator(cloudCsvFolder,skyCsvFolder,graphFolder,distri
                     blues.append(int(row[0]))
                     greens.append(int(row[1]))
                     reds.append(int(row[2]))
-                    #BGRListData.append([int(lineList[0]),int(lineList[1]),int(lineList[2])])
+
+                    #if ("BGR" in distributionCsv) and ("Cloud" in distributionCsv):
+                        #print(f"Reading {row} from {distributionCsv} ")
 
                 except Exception as e:
                     errorlog = f'\nCorrupted data in the form {row} in {distributionCsv}'
@@ -278,9 +307,6 @@ def distributionBarGraphGenerator(cloudCsvFolder,skyCsvFolder,graphFolder,distri
 
         return (blues,greens,reds)
 
-
-
-
     """
     We get the bgr values from our csvs simultaneously and then pass this
     to the graph data
@@ -289,41 +315,86 @@ def distributionBarGraphGenerator(cloudCsvFolder,skyCsvFolder,graphFolder,distri
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
 
-        cloudDistributionDataThread = executor.submit(readDistributionData,cloudDistributionCsvPath)
-        skyDistributionDataThread = executor.submit(readDistributionData,skyDistributionCsvPath)
+        BGRCloudDistributionDataThread = executor.submit(readDistributionData,BGRCloudDistributionCSVPath)
+        BGRSkyDistributionDataThread = executor.submit(readDistributionData,BGRSkyDistributionCSVPath)
+        HSVCloudDistributionDataThread = executor.submit(readDistributionData,HSVCloudDistributionCSVPath)
+        HSVSkyDistributionDataThread = executor.submit(readDistributionData,HSVSkyDistributionCSVPath)
 
-        cloudDistributionBGR = cloudDistributionDataThread.result()
-        skyDistributionBGR = skyDistributionDataThread.result()
+        BGRCloudDistribution = BGRCloudDistributionDataThread.result()
+        BGRSkyDistribution = BGRSkyDistributionDataThread.result()
+        HSVCloudDistribution = HSVCloudDistributionDataThread.result()
+        HSVSkyDistribution = HSVSkyDistributionDataThread.result()
 
 
-        cloudBlues,cloudGreens,cloudReds = cloudDistributionBGR
-        skyBlues,skyGreens,skyReds = skyDistributionBGR
+    #print(len(BGRCloudDistribution))
 
 
+    cloudBlues,cloudGreens,cloudReds = BGRCloudDistribution
+    skyBlues,skyGreens,skyReds = BGRSkyDistribution
 
-    fig,axes = plt.subplots(nrows = 3,ncols = 1)
-    axes = axes.flatten()
+    skyHues, skySats, skyValues = HSVSkyDistribution
+    cloudHues, cloudSats, cloudValues = HSVCloudDistribution
 
-    axes[0].hist(cloudBlues, bins = bins,color = 'blue',alpha= 0.3,label = 'Cloud Hues')
-    axes[0].hist(skyBlues,bins = bins,color = 'purple',alpha = 0.3,label = 'Sky Hues')
-    axes[0].set_xlabel('HSV Hue (0 - 255)')
-    axes[0].set_ylabel('frequency')
-    axes[0].legend(loc="upper left")
+    print(f"- There are: \n > {len(cloudBlues)} Blue cloud datapoints,\n > {len(cloudGreens)} Green cloud datapoints \n > {len(cloudReds)} Red cloud datapoints")
 
-    axes[1].hist(cloudGreens, bins = bins,color = 'green',alpha= 0.3,label = 'Cloud Saturation')
-    axes[1].hist(skyGreens,bins = bins,color = 'yellow',alpha = 0.3,label = 'Sky Saturation')
-    axes[1].set_xlabel('HSV Saturation Value (0 - 255)')
-    axes[1].set_ylabel('frequency')
-    axes[1].legend(loc="upper left")
+    print("\n> CREATING BGR GRAPH...")
+    fig1,axes1 = plt.subplots(nrows = 3,ncols = 1)
+    axes1 = axes1.flatten()
 
-    axes[2].hist(cloudReds, bins = bins,color = 'red',alpha= 0.3,label = 'Cloud Light Values')
-    axes[2].hist(skyReds,bins = bins,color = 'pink',alpha = 0.3,label = 'Sky Light Values')
-    axes[2].set_xlabel('HSV Light Value (0 - 255)')
-    axes[2].set_ylabel('frequency')
-    axes[2].legend(loc="upper left")
+    axes1[0].hist(skyBlues, bins = bins,color = 'blue',alpha= 0.3,label = 'Sky Blues')
+    axes1[0].hist(cloudBlues,bins = bins,color = 'purple',alpha = 0.3,label = 'Cloud Blues')
+    axes1[0].set_xlabel('BGR Blues (0 - 255)')
+    axes1[0].set_ylabel('frequency')
+    axes1[0].legend(loc="upper left")
 
-    fig.tight_layout()
+    axes1[1].hist(cloudGreens, bins = bins,color = 'green',alpha= 0.3,label = 'Cloud Greens')
+    axes1[1].hist(skyGreens,bins = bins,color = 'yellow',alpha = 0.3,label = 'Sky Greens')
+    axes1[1].set_xlabel('BGR Greens (0 - 255)')
+    axes1[1].set_ylabel('frequency')
+    axes1[1].legend(loc="upper left")
+
+    axes1[2].hist(cloudReds, bins = bins,color = 'red',alpha= 0.3,label = 'Cloud Reds')
+    axes1[2].hist(skyReds,bins = bins,color = 'pink',alpha = 0.3,label = 'Sky Reds')
+    axes1[2].set_xlabel('BGR Reds(0 - 255)')
+    axes1[2].set_ylabel('frequency')
+    axes1[2].legend(loc="upper left")
+
+    fig1.tight_layout()
     plt.savefig(bgrGraphsavePath)
+    fig1.clear()
+    plt.close(fig1)
+
+    
+    print(" \n> CREATING HSV GRAPH ...")
+    fig2,axes2 = plt.subplots(nrows = 3,ncols = 1)
+    axes2 = axes2.flatten()
+
+    axes2[0].hist(skyHues, bins = bins,color = 'blue',alpha= 0.3,label = 'Sky Hues')
+    axes2[0].hist(cloudHues,bins = bins,color = 'purple',alpha = 0.3,label = 'Cloud Hues')
+    axes2[0].set_xlabel('HSV Hues (0 - 255)')
+    axes2[0].set_ylabel('frequency')
+    axes2[0].legend(loc="upper left")
+
+    axes2[1].hist(cloudValues, bins = bins,color = 'green',alpha= 0.3,label = 'Cloud Saturation')
+    axes2[1].hist(skyValues,bins = bins,color = 'yellow',alpha = 0.3,label = 'Sky Saturation')
+    axes2[1].set_xlabel('HSV Saturation (0 - 255)')
+    axes2[1].set_ylabel('frequency')
+    axes2[1].legend(loc="upper left")
+
+    axes2[2].hist(cloudSats, bins = bins,color = 'red',alpha= 0.3,label = 'Cloud Value')
+    axes2[2].hist(skySats,bins = bins,color = 'pink',alpha = 0.3,label = 'Sky Value')
+    axes2[2].set_xlabel('HSV Value (0 - 255)')
+    axes2[2].set_ylabel('frequency')
+    axes2[2].legend(loc="upper left")
+
+    fig2.tight_layout()
+    plt.savefig(hsvGraphsavePath)
+    fig2.clear()
+    plt.close(fig2)
+
+
+
+
 
 
 #---------------------------------------------------------------------------------------------------------#
@@ -341,16 +412,15 @@ def main():
     """
     bins = [*range(0,256,1)]
     FuckedImagesCounter = 0
-    blockedImageFolder = r'Main\Blocked-Images'
+    blockedImageFolder = r'Main/Blocked-Images'
     #blockedImageName = r''
     #blockedImagePath = os.path.join(blockedImageFolder,blockedImageName)
 
-    referenceImageFolder = r'Main\Reference-Images'
+    referenceImageFolder = r'Main/Reference-Images'
     #referenceImageName = r''
     #referenceImagePath = os.path.join(referenceImageFolder,referenceImageName)
 
 
-    activeThreads = []
     activeProcesses = []
 
     imagePairList=[]
@@ -358,24 +428,43 @@ def main():
     counter = 0
 
 
-    cloudCsvFolder = r'Main\Cloud-CSVS'
-    skyCsvFolder = r'Main\Sky-CSVS'
-    graphFolder = r'Main\Graphs'
+    cloudCSVFolder = r'Main/Cloud-CSVS'
+    cloudBGRCSVName = 'BGRDistribution.csv'
+    cloudHSVCSVName="HSVDistribution.csv"
+    cloudBGRCSVPath = os.path.join(cloudCSVFolder,cloudBGRCSVName)
+    cloudHSVCSVPath = os.path.join(cloudCSVFolder,cloudHSVCSVName)
 
-    distributionCsvName = 'BGRDistribution.csv'
+    skyCSVFolder = r'Main/Sky-CSVS'
+    skyBGRCSVName = 'BGRDistribution.csv'
+    skyHSVCSVName = "HSVDistribution.csv"
+    skyBGRCSVPath = os.path.join(skyCSVFolder,skyBGRCSVName)
+    skyHSVCSVPath = os.path.join(cloudCSVFolder,skyHSVCSVName)
+
+    graphFolder = r"Main/Graphs"
+
+    BGRDistributionCSVName = "BGRDistribution.csv"
+    
+    HSVDistributionCSVName = "HSVDistribution.csv"
+
+
 
 #---------------------------------------------------------------------------------------------------------#
     """
     If our distribution csvs already exist, we need to delete them
     """
 
-    cloudDistributionCsvPath = os.path.join(cloudCsvFolder,distributionCsvName)
-    skyDistributionCsvPath = os.path.join(skyCsvFolder,distributionCsvName)
 
-    if os.path.isfile(cloudDistributionCsvPath):
-        os.remove(cloudDistributionCsvPath)
-    if os.path.isfile(skyDistributionCsvPath):
-        os.remove(skyDistributionCsvPath)
+    if os.path.isfile(cloudBGRCSVPath):
+        os.remove(cloudBGRCSVPath)
+
+    if os.path.isfile(skyBGRCSVPath):
+        os.remove(skyBGRCSVPath)
+
+    if os.path.isfile(cloudHSVCSVPath):
+        os.remove(cloudHSVCSVPath)
+
+    if os.path.isfile(skyHSVCSVPath):
+        os.remove(skyHSVCSVPath)
 
 #---------------------------------------------------------------------------------------------------------#
 
@@ -456,7 +545,7 @@ def main():
     """
     Now we create our BGR Bar Graph
     """
-    distributionBarGraphGenerator(cloudCsvFolder,skyCsvFolder,graphFolder,distributionCsvName,bins)
+    distributionBarGraphGenerator(cloudCSVFolder,skyCSVFolder,graphFolder,BGRDistributionCSVName,HSVDistributionCSVName,bins)
 
 
 if __name__ == '__main__':
