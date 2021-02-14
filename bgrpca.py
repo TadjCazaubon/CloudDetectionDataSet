@@ -296,11 +296,11 @@ def main():
     start = datetime.now()
 
 
-    cloudDistribution = r'Main\Cloud-CSVS\BGRDistribution.csv'
-    skyDistribution = r'Main\Sky-CSVS\BGRDistribution.csv'
-    savePathScree = r'Main\Graphs\ScreePlot.pdf'
-    savePathPCA = r'Main\Graphs\PCAPlot.pdf'
-    savePathDF = r'Main\Graphs\templateDataFrame.pkl'
+    cloudDistribution = r'Cloud-CSVS/BGRDistribution.csv'
+    skyDistribution = r'Sky-CSVS/BGRDistribution.csv'
+    savePathScree = r'Graphs/ScreePlot.pdf'
+    savePathPCA = r'Graphs/PCAPlot.pdf'
+    savePathDF = r'Graphs/templateDataFrame.pkl'
 
 
     cloudReds=[]

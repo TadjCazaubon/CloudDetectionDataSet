@@ -21,7 +21,6 @@ csv.field_size_limit(2147483647)
 """
 First we need a file queing function to match our image files by name,
 then we need to pass them to our pixel-sort function to generate our csvs.
-
 We use Multiprocessing to simultaneously work with our files, then
 Multithreading within each to write to our csv files.
 """
@@ -43,13 +42,13 @@ def create_csv(Blocked,Reference,counter,FuckedImagesCounter):
     We define our globals we may need for later such as paths
     """
 
-    cloudCSVFolder = r'Main/Cloud-CSVS'
+    cloudCSVFolder = r'Cloud-CSVS'
     cloudBGRCSVName = 'BGRDistribution.csv'
     cloudHSVCSVName="HSVDistribution.csv"
     cloudBGRCSVPath = os.path.join(cloudCSVFolder,cloudBGRCSVName)
     cloudHSVCSVPath = os.path.join(cloudCSVFolder,cloudHSVCSVName)
 
-    skyCSVFolder = r'Main/Sky-CSVS'
+    skyCSVFolder = r'Sky-CSVS'
     skyBGRCSVName = 'BGRDistribution.csv'
     skyHSVCSVName = "HSVDistribution.csv"
     skyBGRCSVPath = os.path.join(skyCSVFolder,skyBGRCSVName)
@@ -72,7 +71,7 @@ def create_csv(Blocked,Reference,counter,FuckedImagesCounter):
 
     blockedImage = cv2.imread(Blocked)
     blockedImageHSV = cv2.cvtColor(blockedImage,cv2.COLOR_BGR2HSV)
-    
+
     #blockedImage = cv2.resize(blockedImage,(400,300))
 
     referenceImage = cv2.imread(Reference)
@@ -98,7 +97,7 @@ def create_csv(Blocked,Reference,counter,FuckedImagesCounter):
     maskOneRedHSV = cv2.inRange(blockedImageHSV,l_b_red1HSV,u_b_red1HSV)
     maskTwoRedHSV = cv2.inRange(blockedImageHSV,l_b_red2HSV,u_b_red2HSV)
 
-    redMaskHSV = cv2.bitwise_or(maskOneRedHSV,maskTwoRedHSV)  
+    redMaskHSV = cv2.bitwise_or(maskOneRedHSV,maskTwoRedHSV)
 
     """
     Now we do the same for Black.
@@ -175,7 +174,6 @@ def create_csv(Blocked,Reference,counter,FuckedImagesCounter):
     """
     We have to create our target function to dynamically write to our csv and report if an error
     occurs.File data that cannot be written to should be reported so they can be ommitted.
-
     Future versions should have an error log to write to after each attempted run.
     """
 
@@ -190,7 +188,7 @@ def create_csv(Blocked,Reference,counter,FuckedImagesCounter):
         except Exception as exception:
 
             DataValueErrorLogName = (datetime.now().strftime("%Y_%b_%d_%H-%M-%S") +".txt")
-            DataValueErrorLogPath = (r"Main/ErrorLogs/WriteLogs/"+ DataValueErrorLogName)
+            DataValueErrorLogPath = (r"ErrorLogs/WriteLogs/"+ DataValueErrorLogName)
             logfile = open(DataValueErrorLogPath,"a")
             errorlog = f"Corrupted or missing value in the form {pixelBGR}"
             logfile.write(errorlog)
@@ -251,7 +249,7 @@ def distributionBarGraphGenerator(cloudCSVFolder,skyCSVFolder,graphFolder,BGRDis
             print("FETCHING DATAPOINTS.")
 
             DataValueErrorLogName = (datetime.now().strftime("%Y_%b_%d_%H-%M-%S")+".txt")
-            DataValueErrorLogNamePath = r"Main/ErrorLogs/ReadLogs/"+ DataValueErrorLogName
+            DataValueErrorLogNamePath = r"ErrorLogs/ReadLogs/"+ DataValueErrorLogName
             logfile = open(DataValueErrorLogNamePath,'a+')
 
             csvReader = csv.reader(file)
@@ -331,7 +329,7 @@ def distributionBarGraphGenerator(cloudCSVFolder,skyCSVFolder,graphFolder,BGRDis
     fig1.clear()
     plt.close(fig1)
 
-    
+
     print(" \n> CREATING HSV GRAPH ...")
     fig2,axes2 = plt.subplots(nrows = 3,ncols = 1)
     axes2 = axes2.flatten()
@@ -373,17 +371,17 @@ This is our main function area.
 
 def main():
 
-
+    start = datetime.now()
     """
     Space for important variables
     """
     bins = [*range(0,256,1)]
     FuckedImagesCounter = 0
-    blockedImageFolder = r'Main/Blocked-Images'
+    blockedImageFolder = r'Blocked-Images'
     #blockedImageName = r''
     #blockedImagePath = os.path.join(blockedImageFolder,blockedImageName)
 
-    referenceImageFolder = r'Main/Reference-Images'
+    referenceImageFolder = r'Reference-Images'
     #referenceImageName = r''
     #referenceImagePath = os.path.join(referenceImageFolder,referenceImageName)
 
@@ -395,22 +393,22 @@ def main():
     counter = 0
 
 
-    cloudCSVFolder = r'Main/Cloud-CSVS'
+    cloudCSVFolder = r'Cloud-CSVS'
     cloudBGRCSVName = 'BGRDistribution.csv'
     cloudHSVCSVName="HSVDistribution.csv"
     cloudBGRCSVPath = os.path.join(cloudCSVFolder,cloudBGRCSVName)
     cloudHSVCSVPath = os.path.join(cloudCSVFolder,cloudHSVCSVName)
 
-    skyCSVFolder = r'Main/Sky-CSVS'
+    skyCSVFolder = r'Sky-CSVS'
     skyBGRCSVName = 'BGRDistribution.csv'
     skyHSVCSVName = "HSVDistribution.csv"
     skyBGRCSVPath = os.path.join(skyCSVFolder,skyBGRCSVName)
     skyHSVCSVPath = os.path.join(cloudCSVFolder,skyHSVCSVName)
 
-    graphFolder = r"Main/Graphs"
+    graphFolder = r"Graphs"
 
     BGRDistributionCSVName = "BGRDistribution.csv"
-    
+
     HSVDistributionCSVName = "HSVDistribution.csv"
 
 
@@ -439,11 +437,9 @@ def main():
     """
     Firstly we need to match our blocked images to our reference images of the
     same name in two seperate folders
-
     We perform os.walk() on our reference image, then walkthrough our blocked
     images for each reference and match the file names. If the names match, they
     are added as a key-value pair in a dictionary and added to our list of pairs.
-
     We can make this faster by using our multiprocessing library to make each os.walk() a thread.
     We use threads over processes here because this task is io bound
     """
@@ -513,6 +509,15 @@ def main():
     Now we create our BGR Bar Graph
     """
     distributionBarGraphGenerator(cloudCSVFolder,skyCSVFolder,graphFolder,BGRDistributionCSVName,HSVDistributionCSVName,bins)
+#---------------------------------------------------------------------------------------------------------#
+
+    runtimeDelta = datetime.now()
+
+    runtime  = runtimeDelta - start
+
+    print(f'Runtime : {runtime}')
+
+#---------------------------------------------------------------------------------------------------------#
 
 
 if __name__ == '__main__':
