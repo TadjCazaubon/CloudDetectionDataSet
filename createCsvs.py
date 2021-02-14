@@ -5,6 +5,7 @@ __credits__ = ["Tadj Cazaubon",'Tohid Ardeshiri']
 import os
 import cv2
 import csv
+import gc
 import matplotlib
 import numpy as np
 import multiprocessing
@@ -12,7 +13,6 @@ import threading
 import concurrent.futures
 from datetime import datetime
 from matplotlib import pyplot as plt
-
 
 
 
@@ -113,16 +113,25 @@ def create_csv(Blocked,Reference,counter,FuckedImagesCounter):
     #----------------------------------------------------------------------------------------------------#
 
 
-    """
-    Now we use apply masks via bitwise ands to get our cloud and sky
-    """
-
     cloudImageHSV = cv2.bitwise_and(referenceImageHSV,referenceImageHSV,mask = redMaskHSV)
     skyImageHSV = cv2.bitwise_and(referenceImageHSV,referenceImageHSV,mask = blackMaskHSV)
 
     cloudImageBGR = cv2.cvtColor(cloudImageHSV,cv2.COLOR_HSV2BGR)
     skyImageBGR =  cv2.cvtColor(skyImageHSV,cv2.COLOR_HSV2BGR)
 
+
+    #----------------------------------------------------------------------------------------------------#
+
+    u_b_red1HSV = []
+    l_b_red1HSV = []
+    u_b_red2HSV = []
+    l_b_red2HSV = []
+    maskOneRedHSV = []
+    maskTwoRedHSV = []
+    redMaskHSV = []
+    u_b_blackHSV = []
+    l_b_blackHSV = []
+    blackMaskHSV = []
 
     #----------------------------------------------------------------------------------------------------#
 
@@ -157,10 +166,10 @@ def create_csv(Blocked,Reference,counter,FuckedImagesCounter):
             cloudH,cloudS,cloudV = cloudPixelValue
             skyH,skyS,skyV = skyPixelValue
 
-            if cloudH!=0 or cloudS!=0 or cloudV!=0:
+            if cloudV!=0:
                     cloudPixelsHSV.append(list(cloudPixelValue))
 
-            if skyH!=0 or skyS!=0 or skyV!=0:
+            if skyV!=0:
                     skyPixelsHSV.append(list(skyPixelValue))
             else:
                 continue
@@ -183,7 +192,7 @@ def create_csv(Blocked,Reference,counter,FuckedImagesCounter):
                 writer = csv.writer(csvFile)
                 writer.writerows(pixelBGR)
                 #print("Writing to csv")
-            csvFile.close()
+            #csvFile.close()
 
         except Exception as exception:
 
@@ -219,7 +228,9 @@ def create_csv(Blocked,Reference,counter,FuckedImagesCounter):
     skyHSVWriter.join()
     cloudHSVWriter.join()
 
+    gc.collect()
 
+    del skyPixelsBGR,cloudPixelsBGR,cloudPixelsHSV,skyPixelsHSV
 #---------------------------------------------------------------------------------------------------------#
 
 def distributionBarGraphGenerator(cloudCSVFolder,skyCSVFolder,graphFolder,BGRDistributionCSVName,HSVDistributionCSVName,bins):
@@ -290,6 +301,7 @@ def distributionBarGraphGenerator(cloudCSVFolder,skyCSVFolder,graphFolder,BGRDis
         HSVCloudDistribution = HSVCloudDistributionDataThread.result()
         HSVSkyDistribution = HSVSkyDistributionDataThread.result()
 
+    gc.collect()
 
     #print(len(BGRCloudDistribution))
 
@@ -300,7 +312,13 @@ def distributionBarGraphGenerator(cloudCSVFolder,skyCSVFolder,graphFolder,BGRDis
     skyHues, skySats, skyValues = HSVSkyDistribution
     cloudHues, cloudSats, cloudValues = HSVCloudDistribution
 
+    BGRCloudDistribution = []
+    BGRSkyDistribution = []
+    HSVCloudDistribution = []
+    HSVSkyDistribution = []
+
     print(f"- There are: \n > {len(cloudBlues)} Blue cloud datapoints,\n > {len(cloudGreens)} Green cloud datapoints \n > {len(cloudReds)} Red cloud datapoints")
+    print(f"- There are: \n > {len(skyBlues)} Blue cloud datapoints,\n > {len(skyGreens)} Green cloud datapoints \n > {len(skyReds)} Red cloud datapoints")
 
     print("\n> CREATING BGR GRAPH...")
     fig1,axes1 = plt.subplots(nrows = 3,ncols = 1)
@@ -311,55 +329,69 @@ def distributionBarGraphGenerator(cloudCSVFolder,skyCSVFolder,graphFolder,BGRDis
     axes1[0].set_xlabel('BGR Blues (0 - 255)')
     axes1[0].set_ylabel('frequency')
     axes1[0].legend(loc="upper left")
+    del skyBlues,cloudBlues
 
     axes1[1].hist(cloudGreens, bins = bins,color = 'green',alpha= 0.3,label = 'Cloud Greens')
     axes1[1].hist(skyGreens,bins = bins,color = 'yellow',alpha = 0.3,label = 'Sky Greens')
     axes1[1].set_xlabel('BGR Greens (0 - 255)')
     axes1[1].set_ylabel('frequency')
     axes1[1].legend(loc="upper left")
+    del cloudGreens,skyGreens
 
     axes1[2].hist(cloudReds, bins = bins,color = 'red',alpha= 0.3,label = 'Cloud Reds')
     axes1[2].hist(skyReds,bins = bins,color = 'pink',alpha = 0.3,label = 'Sky Reds')
     axes1[2].set_xlabel('BGR Reds(0 - 255)')
     axes1[2].set_ylabel('frequency')
     axes1[2].legend(loc="upper left")
-
+    del cloudReds,skyReds
     fig1.tight_layout()
     plt.savefig(bgrGraphsavePath)
-    fig1.clear()
-    plt.close(fig1)
+    fig1.clf()
+    plt.close("all")
+    gc.collect()
+    print("\n> CREATED BGR GRAPH...")
+
 
 
     print(" \n> CREATING HSV GRAPH ...")
     fig2,axes2 = plt.subplots(nrows = 3,ncols = 1)
     axes2 = axes2.flatten()
 
-    axes2[0].hist(skyHues, bins = bins,color = 'blue',alpha= 0.3,label = 'Sky Hues')
+    print(f'sky hues length = {len(skyHues)}, cloud hues length = {len(cloudHues)}')
     axes2[0].hist(cloudHues,bins = bins,color = 'purple',alpha = 0.3,label = 'Cloud Hues')
+    print('done clouds')
+    axes2[0].hist(skyHues, bins = bins,color = 'blue',alpha= 0.3,label = 'Sky Hues')
+    print('done sky')
     axes2[0].set_xlabel('HSV Hues (0 - 255)')
     axes2[0].set_ylabel('frequency')
     axes2[0].legend(loc="upper left")
+    del skyHues,cloudHues
+    print("\n> Hues created...")
 
     axes2[1].hist(cloudValues, bins = bins,color = 'green',alpha= 0.3,label = 'Cloud Saturation')
     axes2[1].hist(skyValues,bins = bins,color = 'yellow',alpha = 0.3,label = 'Sky Saturation')
     axes2[1].set_xlabel('HSV Saturation (0 - 255)')
     axes2[1].set_ylabel('frequency')
     axes2[1].legend(loc="upper left")
+    del skyValues,cloudValues
+    print("\n> Values created...")
 
     axes2[2].hist(cloudSats, bins = bins,color = 'red',alpha= 0.3,label = 'Cloud Value')
     axes2[2].hist(skySats,bins = bins,color = 'pink',alpha = 0.3,label = 'Sky Value')
     axes2[2].set_xlabel('HSV Value (0 - 255)')
     axes2[2].set_ylabel('frequency')
     axes2[2].legend(loc="upper left")
+    del skySats,cloudSats
+    print("\n> Saturation created...")
 
     fig2.tight_layout()
     plt.savefig(hsvGraphsavePath)
-    fig2.clear()
-    plt.close(fig2)
+    fig2.clf()
+    plt.close("all")
 
+    gc.collect()
 
-
-
+    print(" \n> CREATED HSV GRAPH ...")
 
 
 #---------------------------------------------------------------------------------------------------------#
@@ -419,17 +451,10 @@ def main():
     """
 
 
-    if os.path.isfile(cloudBGRCSVPath):
-        os.remove(cloudBGRCSVPath)
+    for f in (cloudBGRCSVPath,skyBGRCSVPath,cloudHSVCSVPath, skyHSVCSVPath,):
+        with open(f, 'w') as file:
+            file.write('')
 
-    if os.path.isfile(skyBGRCSVPath):
-        os.remove(skyBGRCSVPath)
-
-    if os.path.isfile(cloudHSVCSVPath):
-        os.remove(cloudHSVCSVPath)
-
-    if os.path.isfile(skyHSVCSVPath):
-        os.remove(skyHSVCSVPath)
 
 #---------------------------------------------------------------------------------------------------------#
 
@@ -475,7 +500,7 @@ def main():
                 returnValue = (future.result())
                 imagePairList.append(returnValue)
                 print(f'found image pair: {returnValue}')
-
+    gc.collect()
 
 #---------------------------------------------------------------------------------------------------------#
 
