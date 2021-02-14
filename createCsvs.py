@@ -72,6 +72,7 @@ def create_csv(Blocked,Reference,counter,FuckedImagesCounter):
 
     blockedImage = cv2.imread(Blocked)
     blockedImageHSV = cv2.cvtColor(blockedImage,cv2.COLOR_BGR2HSV)
+    
     #blockedImage = cv2.resize(blockedImage,(400,300))
 
     referenceImage = cv2.imread(Reference)
@@ -88,21 +89,6 @@ def create_csv(Blocked,Reference,counter,FuckedImagesCounter):
     Red can have hue values between 0-10, but also 170-180
     """
 
-
-    u_b_red1 = np.array([10, 255, 255])
-    l_b_red1 = np.array([0, 30, 30])
-
-    u_b_red2 = np.array([180, 255, 255])
-    l_b_red2 = np.array([170, 50, 50])
-
-    maskOneRed = cv2.inRange(blockedImage,l_b_red1,u_b_red1)
-    maskTwoRed = cv2.inRange(blockedImage,l_b_red2,u_b_red2)
-
-    redMask = cv2.bitwise_or(maskOneRed,maskTwoRed)
-
-    """
-    Do the same for the HSV values
-    """
     u_b_red1HSV = np.array([10, 255, 255])
     l_b_red1HSV = np.array([0, 30, 30])
 
@@ -119,21 +105,12 @@ def create_csv(Blocked,Reference,counter,FuckedImagesCounter):
     We'll use a range of black to represent The Sky
     """
 
-
-    u_b_black = np.array([180, 255,30])
-    l_b_black = np.array([0, 0, 0])
-
-    blackMask = cv2.inRange(blockedImage,l_b_black,u_b_black)
-
-    """
-    Same for HSV
-    """
     u_b_blackHSV = np.array([180, 255,30])
     l_b_blackHSV = np.array([0, 0, 0])
 
     blackMaskHSV = cv2.inRange(blockedImageHSV,l_b_blackHSV,u_b_blackHSV)
 
-
+    #-------------------------------------------------------------------------------------
     #----------------------------------------------------------------------------------------------------#
 
 
@@ -141,21 +118,11 @@ def create_csv(Blocked,Reference,counter,FuckedImagesCounter):
     Now we use apply masks via bitwise ands to get our cloud and sky
     """
 
-
-    cloudImageBGR = cv2.bitwise_and(referenceImage,referenceImage,mask = redMask)
-    skyImageBGR = cv2.bitwise_and(referenceImage,referenceImage,mask = blackMask)
-
     cloudImageHSV = cv2.bitwise_and(referenceImageHSV,referenceImageHSV,mask = redMaskHSV)
     skyImageHSV = cv2.bitwise_and(referenceImageHSV,referenceImageHSV,mask = blackMaskHSV)
 
-
-
-    #cv2.imshow('BlackMask',blackMask)
-    #cv2.imshow('RedMask',redMask)
-    #cv2.imshow('referenceImage',referenceImage)
-    #cv2.imshow('blockedImage',blockedImage)
-
-    #cv2.waitKey(0)
+    cloudImageBGR = cv2.cvtColor(cloudImageHSV,cv2.COLOR_HSV2BGR)
+    skyImageBGR =  cv2.cvtColor(skyImageHSV,cv2.COLOR_HSV2BGR)
 
 
     #----------------------------------------------------------------------------------------------------#
