@@ -188,18 +188,19 @@ def create_csv(Blocked,Reference,counter,FuckedImagesCounter):
 
     def writeCsv(filePath,pixelBGR):
         try:
-            with open(filePath,'a+',newline = '') as csvFile:
-                writer = csv.writer(csvFile)
-                writer.writerows(pixelBGR)
-                #print("Writing to csv")
-            #csvFile.close()
+            csvFile = open(filePath,'a',newline = '')
+            writer = csv.writer(csvFile)
+            writer.writerows(pixelBGR)
+            csvFile.flush()
+            csvFile.close()
+
 
         except Exception as exception:
 
             DataValueErrorLogName = (datetime.now().strftime("%Y_%b_%d_%H-%M-%S") +".txt")
             DataValueErrorLogPath = (r"ErrorLogs/WriteLogs/"+ DataValueErrorLogName)
             logfile = open(DataValueErrorLogPath,"a")
-            errorlog = f"Corrupted or missing value in the form {pixelBGR}"
+            errorlog = f"Corrupted or missing value in the form {pixelBGR} \n "
             logfile.write(errorlog)
 
             logfile.close()
@@ -296,10 +297,11 @@ def distributionBarGraphGenerator(cloudCSVFolder,skyCSVFolder,graphFolder,BGRDis
         HSVCloudDistributionDataThread = executor.submit(readDistributionData,HSVCloudDistributionCSVPath)
         HSVSkyDistributionDataThread = executor.submit(readDistributionData,HSVSkyDistributionCSVPath)
 
+        HSVSkyDistribution = HSVSkyDistributionDataThread.result()
         BGRCloudDistribution = BGRCloudDistributionDataThread.result()
         BGRSkyDistribution = BGRSkyDistributionDataThread.result()
         HSVCloudDistribution = HSVCloudDistributionDataThread.result()
-        HSVSkyDistribution = HSVSkyDistributionDataThread.result()
+
 
     gc.collect()
 
@@ -339,7 +341,7 @@ def distributionBarGraphGenerator(cloudCSVFolder,skyCSVFolder,graphFolder,BGRDis
     del cloudGreens,skyGreens
 
     axes1[2].hist(cloudReds, bins = bins,color = 'red',alpha= 0.3,label = 'Cloud Reds')
-    axes1[2].hist(skyReds,bins = bins,color = 'pink',alpha = 0.3,label = 'Sky Reds')
+    axes1[2].hist(skyReds,bins = bins,color = 'purple',alpha = 0.3,label = 'Sky Reds')
     axes1[2].set_xlabel('BGR Reds(0 - 255)')
     axes1[2].set_ylabel('frequency')
     axes1[2].legend(loc="upper left")
@@ -377,7 +379,7 @@ def distributionBarGraphGenerator(cloudCSVFolder,skyCSVFolder,graphFolder,BGRDis
     print("\n> Values created...")
 
     axes2[2].hist(cloudSats, bins = bins,color = 'red',alpha= 0.3,label = 'Cloud Value')
-    axes2[2].hist(skySats,bins = bins,color = 'pink',alpha = 0.3,label = 'Sky Value')
+    axes2[2].hist(skySats,bins = bins,color = 'purple',alpha = 0.3,label = 'Sky Value')
     axes2[2].set_xlabel('HSV Value (0 - 255)')
     axes2[2].set_ylabel('frequency')
     axes2[2].legend(loc="upper left")
@@ -423,8 +425,36 @@ def main():
     imagePairList=[]
 
     counter = 0
+#---------------------------------------------------------------------------------------------------------#
+    """
+    If our distribution csvs already exist, we need to delete them
+    """
+    file = open("Cloud-CSVS/BGRDistribution.csv", 'w+')
+    file.write("")
+    file.truncate(0)
+    file.flush()
+    file.close()
+    gc.collect()
+    file = open("Cloud-CSVS/HSVDistribution.csv", 'w+')
+    file.write("")
+    file.truncate(0)
+    file.flush()
+    file.close()
+    gc.collect()
+    file = open("Sky-CSVS/BGRDistribution.csv", 'w+')
+    file.write("")
+    file.truncate(0)
+    file.flush()
+    file.close()
+    gc.collect()
+    file = open("Sky-CSVS/HSVDistribution.csv", 'w+')
+    file.write("")
+    file.truncate(0)
+    file.flush()
+    file.close()
+    gc.collect()
 
-
+#---------------------------------------------------------------------------------------------------------#
     cloudCSVFolder = r'Cloud-CSVS'
     cloudBGRCSVName = 'BGRDistribution.csv'
     cloudHSVCSVName="HSVDistribution.csv"
@@ -452,9 +482,12 @@ def main():
 
 
     for f in (cloudBGRCSVPath,skyBGRCSVPath,cloudHSVCSVPath, skyHSVCSVPath,):
-        with open(f, 'w') as file:
-            file.write('')
-
+        file = open(f, 'r+')
+        file.write("")
+        file.truncate(0)
+        file.flush()
+        file.close()
+        gc.collect()
 
 #---------------------------------------------------------------------------------------------------------#
 
