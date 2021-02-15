@@ -55,7 +55,7 @@ Also check ensure the number of cloud and sky pixels match up
 with the data passed.
 """
 
-def cloudCheck(skyReds,cloudReds):
+def pixelCheck(skyReds,cloudReds):
 
     skyPixelLabel = []
     cloudPixelLabel = []
@@ -72,7 +72,7 @@ def cloudCheck(skyReds,cloudReds):
         cloudPixelLabel.append('cloudPixel'+str(count))
         count+=1
 
-    print(f'\n There are : \n {len(skyPixelLabel)} sky pixels \n {len(cloudPixelLabel)} cloud pixels')
+    print(f'\n > There are : \n {len(skyPixelLabel)} sky pixels \n {len(cloudPixelLabel)} cloud pixels ')
 
     return(cloudPixelLabel,skyPixelLabel)
 
@@ -131,7 +131,6 @@ raised, we need to recreate our dataframe template to fit the dimensions.
 
 
 
-
 def fillDataframe(dataframe,skyPixelLabel,cloudPixelLabel,cloudRGBList,skyRGBList,savePathDF,labels):
 
     """
@@ -177,6 +176,59 @@ def fillDataframe(dataframe,skyPixelLabel,cloudPixelLabel,cloudRGBList,skyRGBLis
         dataframe = dataframe.T
         dataframe.loc['cloudPixel1':finalCloudPixelIndex,'red':'blue'] = cloudRGBList
         dataframe.loc['skyPixel1':finalSkyPixelIndex,'red':'blue'] = skyRGBList
+
+
+
+        print('\n')
+
+        return (dataframe,finalCloudPixelIndex,finalSkyPixelIndex)
+
+
+def fillHSVDataframe(dataframe,skyPixelLabel,cloudPixelLabel,cloudRGBList,skyRGBList,savePathDF,labels):
+
+    """
+    Now we fill our dataframe.
+    """
+
+
+    finalSkyPixelIndex = ('skyPixel' + str(len(skyPixelLabel)))
+    finalCloudPixelIndex = ('cloudPixel' + str(len(cloudPixelLabel)))
+
+    #print(dataframe.head())
+
+
+    try:
+        #print(f'\n > Now filling data for {color} . . .')
+        dataframe = dataframe.T
+        dataframe.loc['cloudPixel1':finalCloudPixelIndex,'values':'hues'] = cloudRGBList
+        dataframe.loc['skyPixel1':finalSkyPixelIndex,'values':'hues'] = skyRGBList
+
+
+
+        print('\n')
+
+        return (dataframe,finalCloudPixelIndex,finalSkyPixelIndex)
+
+    except Exception as e:
+
+        print(f'\n Imported Dataframe not valid for current dataset. Attempting to create new Dataframe . . . \n')
+
+        dataFrameTimerStart = datetime.now()
+
+        dataframe = pd.DataFrame(columns=[*cloudPixelLabel,*skyPixelLabel],index = labels)
+
+        print('\n DataFrame created in ' + str(datetime.now()-dataFrameTimerStart))
+
+        try:
+            dataframe.to_pickle(savePathDF)
+            print(dataframe.head())
+
+        except Exception as e:
+            print(f'\n {e} \n')
+
+        dataframe = dataframe.T
+        dataframe.loc['cloudPixel1':finalCloudPixelIndex,'values':'hues'] = cloudRGBList
+        dataframe.loc['skyPixel1':finalSkyPixelIndex,'hues':'values'] = skyRGBList
 
 
 
@@ -257,7 +309,7 @@ def createPcaDataframe(varPercent,pcaData,cloudPixelLabel,skyPixelLabel,finalClo
     return (cloudPcaDataframe,skyPcaDataframe)
 
 
-def createScatter(cloudPcaDataframe,skyPcaDataframe,varPercent,savePathPCA):
+def createBGRScatter(cloudPcaDataframe,skyPcaDataframe,varPercent,savePathPCA):
 
     """
     Now we can create a scatterplot of our data
@@ -284,6 +336,34 @@ def createScatter(cloudPcaDataframe,skyPcaDataframe,varPercent,savePathPCA):
     print('\n ScatterPlot Created in ' + str(datetime.now()-scatterPlotTimerStart))
 
 
+def createHSVScatter(cloudPcaDataframe,skyPcaDataframe,varPercent,savePathPCA):
+
+    """
+    Now we can create a scatterplot of our data
+    """
+
+
+    print('\n Creating ScatterPlot.')
+    scatterPlotTimerStart = datetime.now()
+
+    plt.scatter(cloudPcaDataframe.PC1,cloudPcaDataframe.PC2, c = 'lightblue',alpha = 0.4,marker = 'X',label = 'Cloud Value')
+    plt.scatter(skyPcaDataframe.PC1,skyPcaDataframe.PC2,c = 'red',alpha = 0.1,marker = 'o',label = 'Sky Value')
+    plt.legend(loc="upper left")
+
+    plt.title('HSVPCA GRAPH')
+    plt.xlabel(f'PC1 VALUE {varPercent[0]}%')
+    plt.ylabel(f'PC2 SATURATION {varPercent[1]}%')
+    #plt.tight_layout()
+
+    """it may be a good idea to make showing and saving the graphs two separate processes."""
+    plt.savefig(savePathPCA)
+    plt.show()
+
+
+
+    print('\n ScatterPlot Created in ' + str(datetime.now()-scatterPlotTimerStart))
+
+
 #---------------------------------------------------------------------------------------------------------#
 
 def main():
@@ -296,12 +376,22 @@ def main():
     start = datetime.now()
 
 
-    cloudDistribution = r'Cloud-CSVS/BGRDistribution.csv'
-    skyDistribution = r'Sky-CSVS/BGRDistribution.csv'
-    savePathScree = r'Graphs/ScreePlot.pdf'
-    savePathPCA = r'Graphs/PCAPlot.pdf'
-    savePathDF = r'Graphs/templateDataFrame.pkl'
+    cloudBGRDistribution = r'Cloud-CSVS/BGRDistribution.csv'
+    skyBGRDistribution = r'Sky-CSVS/BGRDistribution.csv'
+    cloudHSVDistribution = r'Cloud-CSVS/HSVDistribution.csv'
+    skyHSVDistribution = r'Sky-CSVS/HSVDistribution.csv'
 
+    savePathBGRScree = r'Graphs/BGRScreePlot.pdf'
+    savePathHSVScree = r'Graphs/HSVScreePlot.pdf'
+
+    savePathPCABGR = r'Graphs/BGRPCAPlot.pdf'
+    savePathPCAHSV = r'Graphs/HSVPCAPlot.pdf'
+
+    savePathBGRDF = r'Graphs/BGRDataFrame.pkl'
+    savePathHSVDF = r'Graphs/HSVDataFrame.pkl'
+
+
+    #-----------------------------------------------------------------------------------------------------#
 
     cloudReds=[]
     cloudGreens = []
@@ -312,16 +402,30 @@ def main():
     skyBlues = []
 
 
-    labels=['red','green','blue']
+    cloudHues=[]
+    cloudSats=[]
+    cloudValues=[]
 
-#---------------------------------------------------------------------------------------------------------#
+    skyHues=[]
+    skySats=[]
+    skyValues=[]
+
+
+    BGRlabels=['red','green','blue']
+    HSVlabels=["values","sats","hues"]
+
+    #---------------------------------------------------------------------------------------------------------#
 
     """
     Pull sky and cloud colour data from csv files by passing path.
     """
 
-    cloudRGBList = dataPull(cloudDistribution)
-    skyRGBList = dataPull(skyDistribution)
+    cloudRGBList = dataPull(cloudBGRDistribution)
+    skyRGBList = dataPull(skyBGRDistribution)
+
+    skyHSVList = dataPull(skyHSVDistribution)
+    cloudHSVList = dataPull(cloudHSVDistribution)
+
 
 
     for RGBValue in cloudRGBList:
@@ -329,11 +433,24 @@ def main():
         cloudGreens.append(RGBValue[1])
         cloudBlues.append(RGBValue[2])
 
-
     for RGBValue in skyRGBList:
         skyReds.append(RGBValue[0])
         skyGreens.append(RGBValue[1])
         skyBlues.append(RGBValue[2])
+
+
+    """
+    HSV values are flipped because I read the BGR values in the order RBG in the datapull function.
+    """
+    for HSVValue in cloudHSVList:
+        cloudHues.append(HSVValue[2])
+        cloudSats.append(HSVValue[1])
+        cloudValues.append(HSVValue[0])
+
+    for HSVValue in skyHSVList:
+        skyHues.append(HSVValue[2])
+        skySats.append(HSVValue[1])
+        skyValues.append(HSVValue[0])
 
 #---------------------------------------------------------------------------------------------------------#
 
@@ -344,7 +461,9 @@ def main():
     with the data passed.
     """
 
-    cloudPixelLabel,skyPixelLabel = cloudCheck(skyReds,cloudReds)
+    BGRcloudPixelLabel,BGRskyPixelLabel = pixelCheck(skyReds,cloudReds)
+    HSVcloudPixelLabel,HSVskyPixelLabel = pixelCheck(skyHues,cloudHues)
+
 
 #---------------------------------------------------------------------------------------------------------#
     """
@@ -356,11 +475,13 @@ def main():
     If no dataframe exists we create one.
     """
 
-    dataframe = dataframeFrame(savePathDF,cloudPixelLabel,skyPixelLabel,labels)
+    BGRdataframe = dataframeFrame(savePathBGRDF,BGRcloudPixelLabel,BGRskyPixelLabel,BGRlabels)
+    HSVdataframe = dataframeFrame(savePathHSVDF,HSVcloudPixelLabel,HSVskyPixelLabel,HSVlabels)
 
     #print(dataframe.head())
 
-    dataframeFilled,finalCloudPixelIndex,finalSkyPixelIndex = fillDataframe(dataframe,skyPixelLabel,cloudPixelLabel,cloudRGBList,skyRGBList,savePathDF,labels)
+    BGRdataframeFilled,finalBGRCloudPixelIndex,finalBGRSkyPixelIndex = fillDataframe(BGRdataframe,BGRskyPixelLabel,BGRcloudPixelLabel,cloudRGBList,skyRGBList,savePathBGRDF,BGRlabels)
+    HSVdataframeFilled,finalHSVCloudPixelIndex,finalHSVSkyPixelIndex = fillHSVDataframe(HSVdataframe,HSVskyPixelLabel,HSVcloudPixelLabel,cloudHSVList,skyHSVList,savePathHSVDF,HSVlabels)
 
 #---------------------------------------------------------------------------------------------------------#
 
@@ -368,14 +489,18 @@ def main():
     Now we preprocess,scale, fit, and analyze or dataframe data with sklearn
     """
 
-    pcaData,varPercent = processData(dataframeFilled)
+    BGRpcaData,BGRvarPercent = processData(BGRdataframeFilled)
+    HSVpcaData,HSVvarPercent = processData(HSVdataframeFilled)
+
 #---------------------------------------------------------------------------------------------------------#
 
     """
     Now we create our Bar Graph
     """
 
-    createBarGraph(varPercent,labels,savePathScree)
+    createBarGraph(BGRvarPercent,BGRlabels,savePathBGRScree)
+    createBarGraph(HSVvarPercent,HSVlabels,savePathHSVScree)
+
 #---------------------------------------------------------------------------------------------------------#
 
     """
@@ -385,7 +510,8 @@ def main():
     clouds. This is so we can colour-code our data points.
     """
 
-    cloudPcaDataframe,skyPcaDataframe = createPcaDataframe(varPercent,pcaData,cloudPixelLabel,skyPixelLabel,finalCloudPixelIndex,finalSkyPixelIndex)
+    BGRcloudPcaDataframe,BGRskyPcaDataframe = createPcaDataframe(BGRvarPercent,BGRpcaData,BGRcloudPixelLabel,BGRskyPixelLabel,finalBGRCloudPixelIndex,finalBGRSkyPixelIndex)
+    HSVcloudPcaDataframe,HSVskyPcaDataframe = createPcaDataframe(HSVvarPercent,HSVpcaData,HSVcloudPixelLabel,HSVskyPixelLabel,finalHSVCloudPixelIndex,finalHSVSkyPixelIndex)
 
 #---------------------------------------------------------------------------------------------------------#
 
@@ -393,7 +519,8 @@ def main():
     Now we can create a scatterplot of our data
     """
 
-    createScatter(cloudPcaDataframe,skyPcaDataframe,varPercent,savePathPCA)
+    createBGRScatter(BGRcloudPcaDataframe,BGRskyPcaDataframe,BGRvarPercent,savePathPCABGR)
+    createHSVScatter(HSVcloudPcaDataframe,HSVskyPcaDataframe,HSVvarPercent,savePathPCAHSV)
 
 #---------------------------------------------------------------------------------------------------------#
 
