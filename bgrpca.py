@@ -6,10 +6,12 @@ import os
 import csv
 import pandas as pd
 import numpy as np
+import pickle
 from sklearn.decomposition import PCA
 from sklearn import preprocessing
 from datetime import datetime
 from matplotlib import pyplot as plt
+
 
 
 #---------------------------------------------------------------------------------------------------------#
@@ -87,30 +89,34 @@ def  dataframeFrame(savePathDF,cloudPixelLabel,skyPixelLabel,labels):
     extension pkl.
     If no dataframe exists we create one.
     """
+    global saveVar
 
     if os.path.exists(savePathDF):
-
-        print('\n Existing Dataframe detected. Attempting to import . . .')
+        saveVar = True
+        print('\n> Existing Dataframe detected. Attempting to import . . .')
 
         try:
             dataframe = pd.read_pickle(savePathDF)
             #+print(dataframe.head())
+            print("\n > Cache data imported successfully.")
 
         except Exception as e:
-
+            
             print('File is either open or corrupted. Please close or delete it.')
+            saveVar=False
 
 
 
     else:
+        saveVar=False
 
-        print('\n No Dataframe detected. Creating DataFrame . . .')
+        print('\n> No Dataframe detected. Creating DataFrame . . .')
 
         dataFrameTimerStart = datetime.now()
 
         dataframe = pd.DataFrame(columns=[*cloudPixelLabel,*skyPixelLabel],index = labels)
 
-        print('\n DataFrame created in ' + str(datetime.now()-dataFrameTimerStart))
+        print('\n> DataFrame created in ' + str(datetime.now()-dataFrameTimerStart))
 
         try:
             dataframe.to_pickle(savePathDF)
@@ -158,13 +164,13 @@ def fillDataframe(dataframe,skyPixelLabel,cloudPixelLabel,cloudRGBList,skyRGBLis
 
     except Exception as e:
 
-        print(f'\n Imported Dataframe not valid for current dataset. Attempting to create new Dataframe . . . \n')
+        print(f'\n> Imported BGR Dataframe not valid for current dataset. Attempting to create new Dataframe . . . \n')
 
         dataFrameTimerStart = datetime.now()
 
         dataframe = pd.DataFrame(columns=[*cloudPixelLabel,*skyPixelLabel],index = labels)
 
-        print('\n DataFrame created in ' + str(datetime.now()-dataFrameTimerStart))
+        print('\n> DataFrame created in ' + str(datetime.now()-dataFrameTimerStart))
 
         try:
             dataframe.to_pickle(savePathDF)
@@ -211,13 +217,13 @@ def fillHSVDataframe(dataframe,skyPixelLabel,cloudPixelLabel,cloudRGBList,skyRGB
 
     except Exception as e:
 
-        print(f'\n Imported Dataframe not valid for current dataset. Attempting to create new Dataframe . . . \n')
+        print(f'\n> Imported HSV Dataframe not valid for current dataset. Attempting to create new Dataframe . . . \n')
 
         dataFrameTimerStart = datetime.now()
 
         dataframe = pd.DataFrame(columns=[*cloudPixelLabel,*skyPixelLabel],index = labels)
 
-        print('\n DataFrame created in ' + str(datetime.now()-dataFrameTimerStart))
+        print('\n> DataFrame created in ' + str(datetime.now()-dataFrameTimerStart))
 
         try:
             dataframe.to_pickle(savePathDF)
@@ -286,12 +292,13 @@ def createPcaDataframe(varPercent,pcaData,cloudPixelLabel,skyPixelLabel,finalClo
     pcaLabels = ['PC' + str(x) for x in range(1,len(varPercent)+1)]
 
 
-    print('\n Creating DataFrame.')
+    print('\n> Creating final PCA DataFrame ...')
     dataFrameTimerStart2 = datetime.now()
     pcaDataframe = pd.DataFrame(pcaData*10,index=[*cloudPixelLabel,*skyPixelLabel],columns=pcaLabels)
-    print('\n DataFrame Created in ' + str(datetime.now()-dataFrameTimerStart2))
-
+    print('\n> DataFrame Created in ' + str(datetime.now()-dataFrameTimerStart2))
+    print("---------------------------------------------------------")
     print(pcaDataframe.head())
+    print("---------------------------------------------------------")
 
 
     """
@@ -315,25 +322,69 @@ def createBGRScatter(cloudPcaDataframe,skyPcaDataframe,varPercent,savePathPCA):
     Now we can create a scatterplot of our data
     """
 
+    if saveVar == True:
 
-    print('\n Creating ScatterPlot.')
-    scatterPlotTimerStart = datetime.now()
+        print("\n> Data is identical to last known run. Checking for cached BGR scatterplot ...")
 
-    plt.scatter(cloudPcaDataframe.PC1,cloudPcaDataframe.PC2, c = 'lightblue',alpha = 0.4,marker = 'X',label = 'Cloud Value')
-    plt.scatter(skyPcaDataframe.PC1,skyPcaDataframe.PC2,c = 'red',alpha = 0.1,marker = 'o',label = 'Sky Value')
-    plt.legend(loc="upper left")
+        if os.path.exists(savePathPCA):
 
-    plt.title('RGB PCA GRAPH')
-    plt.xlabel(f'PC1 RED {varPercent[0]}%')
-    plt.ylabel(f'PC2 GREEN {varPercent[1]}%')
-    #plt.tight_layout()
+            print("\n> Cached BGR scatterplot found. Checking cached BGR data compatibility ...")
 
-    """it may be a good idea to make showing and saving the graphs two separate processes."""
-    plt.show()
-    plt.savefig(savePathPCA)
+            try:
+                scatterPlotTimerStart = datetime.now()
+                fig = pickle.load(open(savePathPCA,'rb'))
+                print("\n> Cached BGR scatterplot successfully imported")
+                plt.show()
+
+            except Exception as e:
+                print( "\n> Cached BGR data could not be read/loaded.")
+        else:
+            print('\n Cached BGR scatterplot data not found, creating BGR ScatterPlot ...')
+            scatterPlotTimerStart = datetime.now()
+
+            fig,ax = plt.subplots(figsize=(10,6))
+            ax.scatter(cloudPcaDataframe.PC1,cloudPcaDataframe.PC2, c = 'lightblue',alpha = 0.4,marker = 'X',label = 'Cloud Value')
+            ax.scatter(skyPcaDataframe.PC1,skyPcaDataframe.PC2,c = 'red',alpha = 0.1,marker = 'o',label = 'Sky Value')
+            plt.legend(loc="upper left")
+
+            plt.title('RGB PCA GRAPH')
+            plt.xlabel(f'PC1 RED {varPercent[0]}%')
+            plt.ylabel(f'PC2 GREEN {varPercent[1]}%')
+            #plt.tight_layout()
+
+            """it may be a good idea to make showing and saving the graphs two separate processes."""
+            #plt.show()
+            try:
+                pickle.dump(fig,open(savePathPCA,'wb'))
+                print("\n> BGR scatterplot successfully saved.")
+            except Exception as e:
+                print("\n> BGR scatterplot could not be saved correctly. Data will not be cached.")
+            plt.close("all")
+    else:
+        print('\n Cached BGR scatterplot data not available, creating BGR ScatterPlot ...')
+        scatterPlotTimerStart = datetime.now()
+
+        fig,ax = plt.subplots(figsize=(10,6))
+        ax.scatter(cloudPcaDataframe.PC1,cloudPcaDataframe.PC2, c = 'lightblue',alpha = 0.4,marker = 'X',label = 'Cloud Value')
+        ax.scatter(skyPcaDataframe.PC1,skyPcaDataframe.PC2,c = 'red',alpha = 0.1,marker = 'o',label = 'Sky Value')
+        plt.legend(loc="upper left")
+
+        plt.title('RGB PCA GRAPH')
+        plt.xlabel(f'PC1 RED {varPercent[0]}%')
+        plt.ylabel(f'PC2 GREEN {varPercent[1]}%')
+        #plt.tight_layout()
+
+        """it may be a good idea to make showing and saving the graphs two separate processes."""
+        #plt.show()
+        try:
+            pickle.dump(fig,open(savePathPCA,'wb'))
+            print("\n> BGR scatterplot successfully saved.")
+        except Exception as e:
+             print("\n> BGR scatterplot could not be saved correctly. Data will not be cached.")
+        plt.close("all")
 
 
-    print('\n ScatterPlot Created in ' + str(datetime.now()-scatterPlotTimerStart))
+    #print('\n ScatterPlot Created in ' + str(datetime.now()-scatterPlotTimerStart))
 
 
 def createHSVScatter(cloudPcaDataframe,skyPcaDataframe,varPercent,savePathPCA):
@@ -341,27 +392,74 @@ def createHSVScatter(cloudPcaDataframe,skyPcaDataframe,varPercent,savePathPCA):
     """
     Now we can create a scatterplot of our data
     """
+   # print(f"SaveVar is currently {saveVar}")
+    if saveVar == True:
+        
+        print("\n> Data is identical to last known run. Checking for cached HSV scatterplot ...")
 
+        if os.path.exists(savePathPCA):
 
-    print('\n Creating ScatterPlot.')
-    scatterPlotTimerStart = datetime.now()
+            print("\n> Cached HSV scatterplot found. Checking cached HSV data compatibility ...")
 
-    plt.scatter(cloudPcaDataframe.PC1,cloudPcaDataframe.PC2, c = 'lightblue',alpha = 0.4,marker = 'X',label = 'Cloud Value')
-    plt.scatter(skyPcaDataframe.PC1,skyPcaDataframe.PC2,c = 'red',alpha = 0.1,marker = 'o',label = 'Sky Value')
-    plt.legend(loc="upper left")
+            try:
+                scatterPlotTimerStart = datetime.now()
+                fig = pickle.load(open(savePathPCA,'rb'))
+                print("\n> Cached HSV scatterplot successfully imported.")
+                plt.show()
 
-    plt.title('HSVPCA GRAPH')
-    plt.xlabel(f'PC1 VALUE {varPercent[0]}%')
-    plt.ylabel(f'PC2 SATURATION {varPercent[1]}%')
-    #plt.tight_layout()
+            except Exception as e:
+                print( "\n> Cached HSV data could not be read/loaded.")
+        else:
+            print("\n> Cached HSV scatterplot not found. ")
+            scatterPlotTimerStart = datetime.now()
 
-    """it may be a good idea to make showing and saving the graphs two separate processes."""
-    plt.savefig(savePathPCA)
-    plt.show()
+            fig,ax = plt.subplots(figsize=(10,6))
+            ax.scatter(cloudPcaDataframe.PC1,cloudPcaDataframe.PC2, c = 'lightblue',alpha = 0.4,marker = 'X',label = 'Cloud Value')
+            ax.scatter(skyPcaDataframe.PC1,skyPcaDataframe.PC2,c = 'red',alpha = 0.1,marker = 'o',label = 'Sky Value')
+            plt.legend(loc="upper left")
 
+            plt.title('HSV PCA GRAPH')
+            plt.xlabel(f'PC1 VALUE {varPercent[0]}%')
+            plt.ylabel(f'PC2 SATURATION {varPercent[1]}%')
+            #plt.tight_layout()
 
+            """it may be a good idea to make showing and saving the graphs two separate processes."""
+            #plt.show()
 
-    print('\n ScatterPlot Created in ' + str(datetime.now()-scatterPlotTimerStart))
+            try:
+                pickle.dump(fig,open(savePathPCA,'wb'))
+                print("\n> HSV scatterplot successfully saved. ")
+            except Exception as e:
+                print("\n> HSV PCA scatterplot could not be saved correctly. Data will not be cached.")
+
+            plt.close("all")
+    else:
+        print('\n Cached data not available, creating BGR ScatterPlot ...')
+    
+        scatterPlotTimerStart = datetime.now()
+
+        fig,ax = plt.subplots(figsize=(10,6))
+        ax.scatter(cloudPcaDataframe.PC1,cloudPcaDataframe.PC2, c = 'lightblue',alpha = 0.4,marker = 'X',label = 'Cloud Value')
+        ax.scatter(skyPcaDataframe.PC1,skyPcaDataframe.PC2,c = 'red',alpha = 0.1,marker = 'o',label = 'Sky Value')
+        plt.legend(loc="upper left")
+
+        plt.title('HSV PCA GRAPH')
+        plt.xlabel(f'PC1 VALUE {varPercent[0]}%')
+        plt.ylabel(f'PC2 SATURATION {varPercent[1]}%')
+        #plt.tight_layout()
+
+        """it may be a good idea to make showing and saving the graphs two separate processes."""
+        #plt.show()
+
+        try:
+            pickle.dump(fig,open(savePathPCA,'wb'))
+            print("\n> HSV scatterplot successfully saved. ")
+        except Exception as e:
+            print("\n> HSV PCA scatterplot could not be saved correctly. Data will not be cached.")
+
+        plt.close("all")
+
+    #print('\n ScatterPlot Created in ' + str(datetime.now()-scatterPlotTimerStart))
 
 
 #---------------------------------------------------------------------------------------------------------#
@@ -384,8 +482,8 @@ def main():
     savePathBGRScree = r'Graphs/BGRScreePlot.pdf'
     savePathHSVScree = r'Graphs/HSVScreePlot.pdf'
 
-    savePathPCABGR = r'Graphs/BGRPCAPlot.pdf'
-    savePathPCAHSV = r'Graphs/HSVPCAPlot.pdf'
+    savePathPCABGR = r'Graphs/BGRPCAPlot.pkl'
+    savePathPCAHSV = r'Graphs/HSVPCAPlot.pkl'
 
     savePathBGRDF = r'Graphs/BGRDataFrame.pkl'
     savePathHSVDF = r'Graphs/HSVDataFrame.pkl'
