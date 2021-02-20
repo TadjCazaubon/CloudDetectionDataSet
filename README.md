@@ -13,7 +13,7 @@ As of now,'createCsvs.py' takes a given sample of images of the sky in the folde
   folders are iterated over using a zip() and Python3's os.walk(). Each pixel corresponding to one color-blocked as either 
   cloud or sky is saved in a list of sky or cloud pixel BGR values.
   
-    +This is significantly sped up using the multiprocessing and concurrent.futures modules in Python3. Each iteration of the 
+    -This is significantly sped up using the multiprocessing and concurrent.futures modules in Python3. Each iteration of the 
     images is opened as a separate process. I have not capped the number of processes as of yet, but it possible in the future.
     This enables more scalability for larger datasets and to run on more powerful hardware.
   
@@ -40,10 +40,10 @@ As of now,'createCsvs.py' takes a given sample of images of the sky in the folde
   
   -The Dataframe is preprocessed, scaled, fit and transformed using the sklearn library.
   
-    +This is where we get our pca Data(loading scores) to be fit to our graph, and also the variance percent of each principle 
+    -This is where we get our pca Data(loading scores) to be fit to our graph, and also the variance percent of each principle 
     component.
     
-    +A new PCA dataframe is created to later graph our results, with our principle components as labels, and our pixels as columns.
+    -A new PCA dataframe is created to later graph our results, with our principle components as labels, and our pixels as columns.
       
       -This dataframe is split into two separate dataframes, one for our sky pixels, and one for clouds.
       These are then mapped onto a scatterplot, giving each dataframe a colour on our graph to better visualise our data.
