@@ -1,9 +1,6 @@
 # CloudDetectionDataSet
 
-
-# NOTE: Likely this Project will never be completed due to personal reasons 
-
-This is my cloud detection project, done for/with Tohid Ardeshiri.
+#This is my cloud detection project, done for/with Tohid Ardeshiri.
 
 It was made to show the principle components of sky and cloud BGR values to aid in more accurate real-time detection of clouds. 
 
@@ -13,9 +10,9 @@ As of now,'createCsvs.py' takes a given sample of images of the sky in the folde
   folders are iterated over using a zip() and Python3's os.walk(). Each pixel corresponding to one color-blocked as either 
   cloud or sky is saved in a list of sky or cloud pixel BGR values.
   
-    -This is significantly sped up using the multiprocessing and concurrent.futures modules in Python3. Each iteration of the 
-    images is opened as a separate process. I have not capped the number of processes as of yet, but it possible in the future.
-    This enables more scalability for larger datasets and to run on more powerful hardware.
+  --This is significantly sped up using the multiprocessing and concurrent.futures modules in Python3. Each iteration of the 
+  images is opened as a separate process. I have not capped the number of processes as of yet, but it possible in the future.
+  This enables more scalability for larger datasets and to run on more powerful hardware.
   
   
   -The sky and cloud pixel BGR value arrays are written to csv files in Sky-CSVS and Cloud-CSVS respectively. The are both named   
@@ -40,14 +37,14 @@ As of now,'createCsvs.py' takes a given sample of images of the sky in the folde
   
   -The Dataframe is preprocessed, scaled, fit and transformed using the sklearn library.
   
-    -This is where we get our pca Data(loading scores) to be fit to our graph, and also the variance percent of each principle 
-    component.
+  --This is where we get our pca Data(loading scores) to be fit to our graph, and also the variance percent of each principle 
+  component.
     
-    -A new PCA dataframe is created to later graph our results, with our principle components as labels, and our pixels as columns.
+  --A new PCA dataframe is created to later graph our results, with our principle components as labels, and our pixels as columns.
       
-      -This dataframe is split into two separate dataframes, one for our sky pixels, and one for clouds.
-      These are then mapped onto a scatterplot, giving each dataframe a colour on our graph to better visualise our data.
-      Our axes are the two highest components, PC1(red), and PC2(green).
+  ---This dataframe is split into two separate dataframes, one for our sky pixels, and one for clouds.
+    These are then mapped onto a scatterplot, giving each dataframe a colour on our graph to better visualise our data.
+    Our axes are the two highest components, PC1(red), and PC2(green).
       
-        -The variance percventage and therefore thre margin by which these channels are higher than blue varies with the dataset.
+   ---The variance percventage and therefore thre margin by which these channels are higher than blue varies with the dataset.
     
