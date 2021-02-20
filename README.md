@@ -15,15 +15,24 @@ As of now,'createCsvs.py' takes a given sample of images of the sky in the folde
   This enables more scalability for larger datasets and to run on more powerful hardware.
   
   
+  
+  
+  
   -The sky and cloud pixel BGR value arrays are written to csv files in Sky-CSVS and Cloud-CSVS respectively. The are both named   
   'BGRDistribution.csv'.This step is sped up a bit using the threading moduleof Python3. Threading chosen over Multi-Processing 
   because the operation is IO-Bound. The values are written to the files as a method of debugging/investigating lost/corrupted 
   data values.
   
   
+  
+  
+  
   -These BGR values are graphed on a Histogram via matplotlib, as to have the BGR values distributions contrasted for the sky and 
   clouds. Each color channel has its own subplot, with the two distributions show with a low enough alpha to see any points of 
   intersection.
+  
+  
+  
   
 
 'bgrpca.py' reads our BGR data from our respective BGR csvs and creates a dataframe template based on the size of our data.
@@ -32,8 +41,16 @@ As of now,'createCsvs.py' takes a given sample of images of the sky in the folde
   the new data sizes on runs with an updated dataset. If the template does not match the data, a new one is created and the   
   saved one is overwritten.
   
+  
+  
+  
+  
   -The BGR data is then split into the three color channels and mapped onto our dataframe, with the colours as indexes and each pixel  
   as a column.
+  
+  
+  
+  
   
   -The Dataframe is preprocessed, scaled, fit and transformed using the sklearn library.
   
