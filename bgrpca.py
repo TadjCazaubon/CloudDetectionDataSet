@@ -38,7 +38,8 @@ def dataPull(distributionPath):
 
                 RGBValueList.append([int(row[2]),int(row[1]),int(row[0])])
             except Exception as e:
-                print(f'\n Data missing or corrupted at line {(len(RGBValueList)+1)} in {distributionPath}')
+                #print(f'\n Data missing or corrupted at line {(len(RGBValueList)+1)} in {distributionPath}')
+                pass
 
     File.close()
 
@@ -339,7 +340,7 @@ def createBGRScatter(cloudPcaDataframe,skyPcaDataframe,varPercent,savePathPCA):
             except Exception as e:
                 print( "\n> Cached BGR data could not be read/loaded.")
         else:
-            print('\n Cached BGR scatterplot data not found, creating BGR ScatterPlot ...')
+            print('\n> Cached BGR scatterplot data not found, creating BGR ScatterPlot ...')
             scatterPlotTimerStart = datetime.now()
 
             fig,ax = plt.subplots(figsize=(10,6))
@@ -361,7 +362,7 @@ def createBGRScatter(cloudPcaDataframe,skyPcaDataframe,varPercent,savePathPCA):
                 print("\n> BGR scatterplot could not be saved correctly. Data will not be cached.")
             plt.close("all")
     else:
-        print('\n Cached BGR scatterplot data not available, creating BGR ScatterPlot ...')
+        print('\n> Cached BGR scatterplot data not available, creating BGR ScatterPlot ...')
         scatterPlotTimerStart = datetime.now()
 
         fig,ax = plt.subplots(figsize=(10,6))
@@ -434,7 +435,7 @@ def createHSVScatter(cloudPcaDataframe,skyPcaDataframe,varPercent,savePathPCA):
 
             plt.close("all")
     else:
-        print('\n Cached data not available, creating BGR ScatterPlot ...')
+        print('\n> Cached data not available, creating BGR ScatterPlot ...')
     
         scatterPlotTimerStart = datetime.now()
 
