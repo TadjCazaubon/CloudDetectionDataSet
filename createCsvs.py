@@ -258,7 +258,7 @@ def distributionBarGraphGenerator(cloudCSVFolder,skyCSVFolder,graphFolder,BGRDis
 
         with open(distributionCsv,'r') as file:
 
-            print("FETCHING DATAPOINTS.")
+            print("\n > Fetching DataPoints...")
 
             DataValueErrorLogName = (datetime.now().strftime("%Y_%b_%d_%H-%M-%S")+".txt")
             DataValueErrorLogNamePath = r"ErrorLogs/ReadLogs/"+ DataValueErrorLogName
@@ -319,10 +319,10 @@ def distributionBarGraphGenerator(cloudCSVFolder,skyCSVFolder,graphFolder,BGRDis
     HSVCloudDistribution = []
     HSVSkyDistribution = []
 
-    print(f"- There are: \n > {len(cloudBlues)} Blue cloud datapoints,\n > {len(cloudGreens)} Green cloud datapoints \n > {len(cloudReds)} Red cloud datapoints")
-    print(f"- There are: \n > {len(skyBlues)} Blue cloud datapoints,\n > {len(skyGreens)} Green cloud datapoints \n > {len(skyReds)} Red cloud datapoints")
+    print(f"\n> There are: \n > {len(cloudBlues)} Blue cloud datapoints,\n > {len(cloudGreens)} Green cloud datapoints \n > {len(cloudReds)} Red cloud datapoints")
+    print(f"\n> There are: \n > {len(skyBlues)} Blue cloud datapoints,\n > {len(skyGreens)} Green cloud datapoints \n > {len(skyReds)} Red cloud datapoints")
 
-    print("\n> CREATING BGR GRAPH...")
+    print("\n> Creating BGR Bar Graph now ...")
     fig1,axes1 = plt.subplots(nrows = 3,ncols = 1)
     axes1 = axes1.flatten()
 
@@ -351,24 +351,24 @@ def distributionBarGraphGenerator(cloudCSVFolder,skyCSVFolder,graphFolder,BGRDis
     fig1.clf()
     plt.close("all")
     gc.collect()
-    print("\n> CREATED BGR GRAPH...")
+    print("\n> BGR Bar Graph created ...")
 
 
 
-    print(" \n> CREATING HSV GRAPH ...")
+    print(" \n> Creating HSV Graph now ...")
     fig2,axes2 = plt.subplots(nrows = 3,ncols = 1)
     axes2 = axes2.flatten()
 
-    print(f'sky hues length = {len(skyHues)}, cloud hues length = {len(cloudHues)}')
+    print(f'\n> sky hues length = {len(skyHues)} \n> cloud hues length = {len(cloudHues)}')
     axes2[0].hist(cloudHues,bins = bins,color = 'purple',alpha = 0.3,label = 'Cloud Hues')
-    print('done clouds')
+    #print('done clouds')
     axes2[0].hist(skyHues, bins = bins,color = 'blue',alpha= 0.3,label = 'Sky Hues')
-    print('done sky')
+    #print('done sky')
     axes2[0].set_xlabel('HSV Hues (0 - 255)')
     axes2[0].set_ylabel('frequency')
     axes2[0].legend(loc="upper left")
     del skyHues,cloudHues
-    print("\n> Hues created...")
+    #print("\n> Hues created...")
 
     axes2[1].hist(cloudValues, bins = bins,color = 'green',alpha= 0.3,label = 'Cloud Saturation')
     axes2[1].hist(skyValues,bins = bins,color = 'yellow',alpha = 0.3,label = 'Sky Saturation')
@@ -376,7 +376,7 @@ def distributionBarGraphGenerator(cloudCSVFolder,skyCSVFolder,graphFolder,BGRDis
     axes2[1].set_ylabel('frequency')
     axes2[1].legend(loc="upper left")
     del skyValues,cloudValues
-    print("\n> Values created...")
+    #print("\n> Values created...")
 
     axes2[2].hist(cloudSats, bins = bins,color = 'red',alpha= 0.3,label = 'Cloud Value')
     axes2[2].hist(skySats,bins = bins,color = 'purple',alpha = 0.3,label = 'Sky Value')
@@ -384,7 +384,7 @@ def distributionBarGraphGenerator(cloudCSVFolder,skyCSVFolder,graphFolder,BGRDis
     axes2[2].set_ylabel('frequency')
     axes2[2].legend(loc="upper left")
     del skySats,cloudSats
-    print("\n> Saturation created...")
+    #print("\n> Saturation created ...")
 
     fig2.tight_layout()
     plt.savefig(hsvGraphsavePath)
@@ -393,7 +393,7 @@ def distributionBarGraphGenerator(cloudCSVFolder,skyCSVFolder,graphFolder,BGRDis
 
     gc.collect()
 
-    print(" \n> CREATED HSV GRAPH ...")
+    print(" \n> HSV Graph created ...")
 
 
 #---------------------------------------------------------------------------------------------------------#
@@ -532,7 +532,7 @@ def main():
                 future = executor.submit(fileScan, [blockImageName,blockedImageFolder,referenceImageFolder])
                 returnValue = (future.result())
                 imagePairList.append(returnValue)
-                print(f'found image pair: {returnValue}')
+                print(f'\n> Found image pair: {returnValue}')
     gc.collect()
 
 #---------------------------------------------------------------------------------------------------------#
@@ -543,7 +543,7 @@ def main():
 
     for imagePair in imagePairList:
         try:
-            print(f'\nNow appending images: \n > {imagePair[0]}')
+            print(f'\n> Now appending images: \n > {imagePair[0]}')
             blockedImagePath,referenceImagePath = imagePair[0]
             counter+=1
             FuckedImagesCounter+=1
@@ -573,7 +573,7 @@ def main():
 
     runtime  = runtimeDelta - start
 
-    print(f'Runtime : {runtime}')
+    print(f'\n> Runtime : {runtime}')
 
 #---------------------------------------------------------------------------------------------------------#
 
